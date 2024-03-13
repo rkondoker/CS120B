@@ -1,0 +1,86 @@
+#include "Timer.h"
+#include "LiquidCrystal.h"
+
+//global vars
+//used arduino website to see how to intialize
+const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
+
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+
+String phrase1;
+String phrase2;
+int count = 0;
+
+enum STATE{INIT, PHRASE1, ENTER2, PHRASE2 } gState = INIT;
+
+void tick(void){
+  //state transitions
+  switch(gState){
+    case INIT:
+    lcd.clear();
+    lcd.print("Enter a Phrase");
+
+    while(Serial.available() == 0 ){}
+    phrase1 = Serial.readString();
+    gState = PHRASE1;
+    break;
+
+    case PHRASE1:
+    lcd.clear();
+    if(count < 10){
+      lcd.print(phrase1);
+      count++;
+    }
+    else{
+      count = 0;
+      gState = ENTER2;
+    }
+    
+    break;
+
+    case ENTER2:
+    lcd.clear();
+    lcd.print("Enter a Phrase");
+    while(Serial.available() == 0 ){}
+    phrase2 = Serial.readString();
+    gState = PHRASE2;
+    break;
+
+    case PHRASE2:
+        lcd.clear();
+
+    if(count < 10){
+      lcd.print(phrase1);
+      lcd.setCursor(0, 1);
+      lcd.print(phrase2);
+      count++;
+    }
+    else{
+      count = 0;
+      gState = INIT;
+    }
+  
+    break;
+  }
+
+}
+
+
+
+void setup() {
+  // put your setup code here, to run once:
+  TimerSet(500); //this value (500) is the period in ms
+  TimerOn();
+  lcd.begin(16, 2);
+  lcd.clear();
+  Serial.begin(9600);
+
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  tick();
+  while(!TimerFlag){}
+  TimerFlag = 0; 
+
+}

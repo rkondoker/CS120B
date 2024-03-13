@@ -1,0 +1,96 @@
+//Lab5e3.cpp
+#include "Timer.h"
+#include "LiquidCrystal.h"
+//global vars
+//used arduino website to see how to intialize
+const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
+
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+int buttonState = 0;
+int buttonPin = 13;
+int xPin= A2;
+int yPin = A1;
+int xAxis = 0;
+int yAxis = 1;
+
+int cursorX = 0;
+int cursorY = 0;
+
+int numChar = 0;
+
+void setup() {
+  pinMode(buttonPin, INPUT_PULLUP);
+  TimerSet(500); //this value (500) is the period in ms
+  TimerOn();
+  lcd.begin(16, 2);
+  lcd.clear();
+  Serial.begin(9600);
+  lcd.setCursor(0, 1);
+  //lcd.print("testing");
+  
+
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  buttonState = digitalRead(buttonPin);
+  xAxis = analogRead(xPin);
+  yAxis = analogRead(yPin);
+
+
+  Serial.println(buttonState);
+  
+  // move cursor around 
+  //507y and 512x center
+  if(xAxis > 750){
+    cursorX++;
+    if(cursorX > 15){
+      cursorX = 0;
+    }
+  }
+  else if (xAxis < 250){
+    cursorX--;
+    if(cursorX < 1){
+      cursorX = 0;
+    }
+  }
+
+  if(yAxis > 750){
+    cursorY++;
+    if(cursorY > 1){
+      cursorY = 0;
+    }
+  }
+  else if(yAxis < 250){
+    cursorY--;
+    if (cursorY < 1){
+      cursorY = 0;
+    }
+  }
+
+  lcd.setCursor(cursorX, cursorY);
+
+  //print character
+  if(buttonState == 0){
+    if(numChar < 5 ){
+      lcd.print("a");
+      numChar++;
+    }
+    else if(numChar > 4){
+      lcd.clear();
+      cursorX = 0;
+      cursorY = 0;
+      lcd.setCursor(0, 0);
+
+      numChar = 0;
+    }
+  }
+
+
+  //Serial.println(xAxis);
+  Serial.println(numChar);
+
+
+  while(!TimerFlag){}
+  TimerFlag = 0; 
+}

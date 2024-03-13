@@ -1,0 +1,59 @@
+ int B[3] = {2,3,4};
+
+void setup() {
+  // put your setup code here, to run once:
+ 
+  for(int i = 0; i < 3 ; i++){
+    pinMode(B[i],OUTPUT);
+  }
+
+  Serial.begin(9600);
+}
+
+void LEDoff(){
+  for (int i = 0; i < 3; i++){
+  	digitalWrite(B[i], LOW);
+  }
+}
+
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  Serial.print("What is the temperature in F\n");
+
+  
+
+  int input;
+
+
+  while(Serial.available() == 0){}
+
+  input = Serial.parseInt();
+
+  Serial.println(input);
+
+
+  if (input < 65){
+    digitalWrite(B[0], HIGH);
+    Serial.print("Green F\n");
+
+    
+  }
+  else if (input < 96){
+    digitalWrite(B[1], HIGH);
+    Serial.print("Blue F\n");
+
+    
+  }
+  else{
+    digitalWrite(B[2], HIGH);
+    Serial.print("Red F\n");
+
+  }
+  
+  delay(1000);
+  LEDoff();
+
+
+
+}
